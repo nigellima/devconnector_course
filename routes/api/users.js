@@ -27,7 +27,6 @@ router.post('/register', (req, res) => {
                 });
 
                 bcrypt.genSalt(10, (err, salt) => {
-                    console.log(req.body.name);
                     bcrypt.hash(newUser.password, salt, (err, hash) => {
                         if(err) throw err;
                         newUser.password = hash;
@@ -37,6 +36,32 @@ router.post('/register', (req, res) => {
                     }); 
                 });
             }
+        });
+});
+
+// @route  POST api/users/login
+// @desc   Login user / Returning JWT
+// @access PUBLIC
+router.post('/login', (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    //Find user by email
+    User.findOne({email: email})
+        .then(user => {
+            //Check user
+            if(!user)
+                return res.status(404).json({email: 'User not found!'});
+
+            //Check password
+            bcrypt.compare(password, user.password)
+                .then(isMatch => {
+                    if(isMatch){
+                        res.json({msg: 'Success'});
+                    } else {
+                        res.status(400).json({password: 'Password incorrect'});
+                    }
+                });
         });
 });
 
