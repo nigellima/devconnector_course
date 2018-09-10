@@ -29,6 +29,59 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
         .catch(err => res.status(404).json(err));
 });
 
+
+// @route  api/profile/all
+// @desc   GET get all profiles
+// @access PUBLIC
+router.get('/all', (req, res) => {
+    const errors  = {};
+    Profile.find()
+        .populate('user', ['name', 'avatar'])
+        .then(profiles => {
+            if(!profiles){
+                errors.noprofile = "There are no profiles";
+                res.status(404).json();
+            }
+            res.json(profiles);
+        })
+        .catch(err => res.status(404).json(err));;
+});
+
+// @route  api/profile/handle/:handle
+// @desc   GET get profile by handle
+// @access PUBLIC
+router.get('/handle/:handle', (req, res) => {
+    let errors = {};
+    Profile.findOne({ handle: req.params.handle})
+        .populate('user', ['name', 'avatar'])
+        .then(profile => {
+            if(!profile){
+                errors.noprofile = 'There is no profile for this user';
+                res.status(404).json(errors);
+            }
+            res.json(profile);
+        })
+        .catch(err => res.status(404).json(err));
+});
+
+
+// @route  api/profile/user/:user_id
+// @desc   GET get profile by user id
+// @access PUBLIC
+router.get('/user/:user_id', (req, res) => {
+    let errors = {};
+    Profile.findOne({ user: req.params.user_id})
+        .populate('user', ['name', 'avatar'])
+        .then(profile => {
+            if(!profile){
+                errors.noprofile = 'There is no profile for this user';
+                res.status(404).json(errors);
+            }
+            res.json(profile);
+        })
+        .catch(err => res.status(404).json(err));
+});
+
 // @route  api/profile/
 // @desc   POST create or edit profile
 // @access PRIVATE
@@ -85,6 +138,14 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
                 new Profile(profileFields).save().then(profile => { res.json(profile)});
             }
         });
+});
+
+
+// @route  api/profile/experience
+// @desc   POST add experience to profile
+// @access PRIVATE
+router.post('/experience', passport.authenticate('jwt', { session: false }), (req, res) => {
+    
 });
 
 module.exports = router;
