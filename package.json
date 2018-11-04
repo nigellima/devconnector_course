@@ -26,5 +26,11 @@
   },
   "devDependencies": {
     "nodemon": "^1.17.4"
+  },
+  "proxy": {
+    "/api": {
+      "target": "https://localhost:500",
+      "secure": false
+    }
   }
 }
